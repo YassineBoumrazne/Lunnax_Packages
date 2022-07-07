@@ -54,7 +54,7 @@
                         </MudItem>                    
                     }
                     <MudItem xs="12">
-                        <MudTable Items="@currentPackage.Periods" Bordered="true" Filter="new Func<PeriodDto,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
+                        <MudTable Items="@currentPackage.Periods" Breakpoint="Breakpoint.None" Bordered="true" Filter="new Func<PeriodDto,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
                             <ToolBarContent>
                                 <MudButton OnClick="AddPeriod" Class="mr-2" Style="@($"background-color:{Colors.BlueGrey.Lighten1}")" Size="Size.Small" Variant="Variant.Filled" StartIcon="@Icons.Filled.Add">Create</MudButton>
                                 <MudSpacer />

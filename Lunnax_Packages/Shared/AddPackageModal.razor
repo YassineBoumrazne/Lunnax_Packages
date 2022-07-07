@@ -1,11 +1,9 @@
 ﻿
-
 @inject IDialogService DialogService
-
 
 <EditForm EditContext="editContext" OnValidSubmit="Addpackage">
     <DataAnnotationsValidator/>
-    <MudDialog Style="width:700px;max-height:95%; overflow-y: scroll;">
+    <MudDialog Style="max-width: 600px;max-height:95%; overflow-y: scroll;">
         <TitleContent>
             <MudText Typo="Typo.h6">
                 <MudIcon Icon="@Icons.Filled.Add" Class="mr-3"/>
@@ -50,7 +48,7 @@
                         </MudItem>                    
                     }
                     <MudItem xs="12">
-                        <MudTable Items="@package.Periods" Bordered="true" Filter="new Func<PeriodDto,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
+                        <MudTable Items="@package.Periods" Breakpoint="Breakpoint.None" Bordered="true" Filter="new Func<PeriodDto,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
                             <ToolBarContent>
                                 <MudButton OnClick="AddPeriod" Class="mr-2" Style="@($"background-color:{Colors.BlueGrey.Lighten1}")" Size="Size.Small" Variant="Variant.Filled" StartIcon="@Icons.Filled.Add">Create</MudButton>
                                 <MudSpacer />
@@ -89,20 +87,20 @@
                 <MudItem xs="12">
                     <MudTextField @bind-Value="package.Formula" Margin="Margin.Dense" Label="Formula" Variant="Variant.Outlined"></MudTextField>
                 </MudItem>
-                <MudItem xs="4">
+                <MudItem xs="12" sm="4">
                     <MudSelect @bind-Value="package.PackageBookingBaseEnumId" T="int" Label="PackageBookingBaseEnumId" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Variant="Variant.Outlined">
                         <MudSelectItem Value="@(1)" />
                         <MudSelectItem Value="@(2)" />
                         <MudSelectItem Value="@(3)" />
                     </MudSelect>
                 </MudItem>
-                <MudItem xs="4">
+                <MudItem xs="12" sm="4">
                     <MudSelect @bind-Value="package.PackageBookingBaseEnumId" T="int" Label="PackageBookingBaseEnumId" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Variant="Variant.Outlined">
                         <MudSelectItem Value="@(1)" />
                         <MudSelectItem Value="@(2)" />
                         <MudSelectItem Value="@(3)" />
                     </MudSelect>                </MudItem>
-                <MudItem xs="4">
+                <MudItem xs="12" sm="4">
                     <MudSelect @bind-Value="package.PackageBookingBaseEnumId" T="int" Label="PackageBookingBaseEnumId" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Variant="Variant.Outlined">
                         <MudSelectItem Value="@(1)" />
                         <MudSelectItem Value="@(2)" />
@@ -149,7 +147,9 @@
 
     private async Task AddPeriod()
     {
-        var dialog = DialogService.Show<AddPeriodModal>();
+        var LastPeriodEnd = package.Periods.LastOrDefault() == null ? null : package.Periods.LastOrDefault().End;
+        var parameters = new DialogParameters { ["LastPeriodEnd"]= LastPeriodEnd };
+        var dialog = DialogService.Show<AddPeriodModal>("",parameters);
         var result = await dialog.Result;
 
         if (!result.Cancelled)

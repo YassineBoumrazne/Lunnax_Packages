@@ -12,7 +12,7 @@
         <DialogContent>
             <MudGrid>
                 <MudItem xs="5">
-                    <MudDatePicker @bind-Date="period.Start" For="()=>period.Start" MaxDate="period.End" DisableToolbar Label="Start" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    <MudDatePicker @bind-Date="period.Start" For="()=>period.Start" MaxDate="period.End" MinDate="LastPeriodEnd" DisableToolbar Label="Start" Variant="Variant.Outlined" Margin="Margin.Dense" />
                 </MudItem>
                 <MudItem xs="5">
                     <MudDatePicker @bind-Date="period.End" For="()=>period.End" MinDate="period.Start" DisableToolbar Label="End" Variant="Variant.Outlined" Margin="Margin.Dense" />
@@ -35,6 +35,9 @@
 @code{
     [Parameter]
     public PeriodDto period { get; set; } = new PeriodDto();
+
+    [Parameter]
+    public DateTime? LastPeriodEnd { get; set; } = new DateTime();
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
     private EditContext editContext;
