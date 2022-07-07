@@ -1,0 +1,106 @@
+﻿@page "/"
+
+@inject IDialogService DialogService
+@inject IPackagesService packagesService
+
+<PageTitle>Packages</PageTitle>
+
+<MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-1">Packages</MudText>
+<MudText Typo="Typo.body1" Class="mb-2">Manage Packages</MudText>
+
+
+<MudTable @ref="table" Items="@packagesService.Packages" Breakpoint="Breakpoint.None" Bordered="true" Filter="new Func<PackageDto,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
+    <ToolBarContent>
+        <MudButton OnClick="AddPackage" Class="mr-2" Style="@($"background-color:{Colors.BlueGrey.Lighten1}")" Size="Size.Small" Variant="Variant.Filled" StartIcon="@Icons.Filled.Add">Create</MudButton>
+        <MudButton Size="Size.Small" Variant="Variant.Filled" StartIcon="@Icons.Filled.RotateRight" Color="Color.Info">Reload</MudButton>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search for Packages" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Actions</MudTh>
+        <MudTh>Kz</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh>Display</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Actions"><MudIconButton OnClick="()=>Editpackage(context)" Icon="@Icons.Filled.Edit" aria-label="Edit"></MudIconButton></MudTd>
+        <MudTd DataLabel="Kz">@context.Kz</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Display">@context.Display</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private string searchString1 = "";
+    private PackageDto selectedItem1 = null;
+    private HashSet<PackageDto> selectedItems = new HashSet<PackageDto>();
+
+    public MudTable<PackageDto> table { get; set; }
+
+
+    private bool FilterFunc1(PackageDto element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(PackageDto element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Kz is not null && element.Kz.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Name is not null && element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Display is not null && element.Display.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    private async Task AddPackage()
+    {
+        var dialog = DialogService.Show<AddPackageModal>();
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            PackageDto packageDto = (PackageDto)result.Data;
+
+            packagesService.AddPackage(packageDto);
+        }
+    }
+
+    async Task Editpackage(PackageDto package)
+    {
+        var parameters = new DialogParameters { ["currentPackage"]= PackageDtoToModal(package) };
+        var dialog = DialogService.Show<EditPackageModal>($"Edit Package - Id: {package.Id}",parameters);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            PackageDto annonceDTORes = (PackageDto)result.Data;
+            packagesService.UpdatePackage(annonceDTORes);
+        }
+    }
+
+    private PackageDto PackageDtoToModal(PackageDto package)
+    {
+        PackageDto currentPackage = new PackageDto();
+        currentPackage.Description = package.Description;
+        currentPackage.Display = package.Display;
+        currentPackage.Formula = package.Formula;
+        currentPackage.Id = package.Id;
+        currentPackage.InvoicePosition = package.InvoicePosition;
+        currentPackage.ItemId = package.ItemId;
+        currentPackage.Kz = package.Kz;
+        currentPackage.Name = package.Name;
+        currentPackage.Optional = package.Optional;
+        currentPackage.PackageBookingBaseEnumId = package.PackageBookingBaseEnumId;
+        currentPackage.PackageBookingMechanicEnumId = package.PackageBookingMechanicEnumId;
+        currentPackage.PackageBookingRhythmEnumId = package.PackageBookingRhythmEnumId;
+        currentPackage.Periods = package.Periods;
+        currentPackage.Price = package.Price;
+        currentPackage.PriceIsStatic = package.PriceIsStatic;
+        currentPackage.ShopExtern = package.ShopExtern;
+        return currentPackage;
+    }
+}

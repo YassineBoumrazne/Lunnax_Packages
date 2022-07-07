@@ -1,0 +1,224 @@
+﻿
+@inject IDialogService DialogService
+
+<EditForm EditContext="editContext" OnValidSubmit="Editpackage">
+    <DataAnnotationsValidator/>
+    <MudDialog Style="max-height:95%; overflow-y: scroll;">
+        <TitleContent>
+            <MudText Typo="Typo.h6">
+                <MudIcon Icon="@Icons.Filled.Update" Class="mr-3"/>
+                Edit Package - Id: @currentPackage.Id
+            </MudText>
+        </TitleContent>
+        <DialogContent>
+            <MudGrid Spacing="2">
+                <MudItem xs="2">
+                    <MudText Typo="Typo.caption">Room Id</MudText>
+                    <MudItem xs="2">
+                    <MudText Typo="Typo.caption">@(currentPackage.Id)</MudText>
+                    </MudItem>
+                </MudItem>
+                <MudItem xs="5">
+                    <MudTextField @bind-Value="currentPackage.Name" Margin="Margin.Dense" Label="Name" Variant="Variant.Outlined"></MudTextField>
+                </MudItem>
+                <MudItem xs="5">
+                    <MudTextField @bind-Value="currentPackage.Kz" Margin="Margin.Dense" Label="Kz" Variant="Variant.Outlined"></MudTextField>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="currentPackage.Description" Margin="Margin.Dense" Label="Description" Lines="4" Variant="Variant.Outlined"></MudTextField>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="currentPackage.Display" Margin="Margin.Dense" Label="Display" Lines="3" Variant="Variant.Outlined"></MudTextField>
+                </MudItem>
+                @if (currentPackage.PriceIsStatic)
+                {
+                    <MudItem xs="6">
+                        <MudCheckBox @bind-Checked="@currentPackage.PriceIsStatic" Label="Price Is Static" Color="Color.Info"></MudCheckBox>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="currentPackage.Price" Margin="Margin.Dense" Label="Price" Variant="Variant.Outlined" />
+                    </MudItem>
+                }
+                else
+                {
+                    @if (currentPackage.Periods.Any())
+                    {
+                        <MudItem xs="12">
+                            <MudCheckBox @bind-Checked="@currentPackage.PriceIsStatic" Disabled Label="Price Is Static" Color="Color.Info"></MudCheckBox>
+                        </MudItem>
+                    }
+                    else
+                    {
+                        <MudItem xs="12">
+                            <MudCheckBox @bind-Checked="@currentPackage.PriceIsStatic" Label="Price Is Static" Color="Color.Info"></MudCheckBox>
+                        </MudItem>                    
+                    }
+                    <MudItem xs="12">
+                        <MudTable Items="@currentPackage.Periods" Bordered="true" Filter="new Func<PeriodDto,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
+                            <ToolBarContent>
+                                <MudButton OnClick="AddPeriod" Class="mr-2" Style="@($"background-color:{Colors.BlueGrey.Lighten1}")" Size="Size.Small" Variant="Variant.Filled" StartIcon="@Icons.Filled.Add">Create</MudButton>
+                                <MudSpacer />
+                                <MudTextField @bind-Value="searchString1" Placeholder="Search for Packages" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                            </ToolBarContent>
+                            <HeaderContent>
+                                <MudTh>Actions</MudTh>
+                                <MudTh>Price</MudTh>
+                                <MudTh>Source</MudTh>
+                                <MudTh>Start</MudTh>
+                                <MudTh>End</MudTh>
+                            </HeaderContent>
+                            <RowTemplate Context="period">
+                                <MudTd DataLabel="Actions">
+                                    <MudIconButton OnClick="()=>EditPeriod(period)" Icon="@Icons.Filled.Edit" aria-label="Edit"></MudIconButton>
+                                    <MudIconButton OnClick="()=>DeletePeriod(period)" Icon="@Icons.Filled.Delete" aria-label="Delete"></MudIconButton>
+                                </MudTd>
+                                <MudTd DataLabel="Price">@period.Price</MudTd>
+                                <MudTd DataLabel="Source">@period.Source</MudTd>
+                                <MudTd DataLabel="Start">@period.Start.Value.ToShortDateString()</MudTd>
+                                <MudTd DataLabel="End">@period.End.Value.ToShortDateString()</MudTd>
+                            </RowTemplate>
+                            <PagerContent>
+                                <MudTablePager />
+                            </PagerContent>
+                        </MudTable>
+                    </MudItem>
+                }
+                <MudItem xs="6">
+                    <MudSelect T="string" Label="Item" Placeholder="Select Item" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Variant="Variant.Outlined">
+                        <MudSelectItem Value="@("Cappuccino")" />
+                        <MudSelectItem Value="@("Cafe Latte")" />
+                        <MudSelectItem Value="@("Espresso")" />
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudNumericField @bind-Value="currentPackage.InvoicePosition" Label="InvoicePosition" Variant="Variant.Outlined" Step="1" Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="currentPackage.Formula" Margin="Margin.Dense" Label="Formula" Variant="Variant.Outlined"></MudTextField>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudSelect @bind-Value="currentPackage.PackageBookingBaseEnumId" T="int" Label="PackageBookingBaseEnumId" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Variant="Variant.Outlined">
+                        <MudSelectItem Value="@(1)" />
+                        <MudSelectItem Value="@(2)" />
+                        <MudSelectItem Value="@(3)" />
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudSelect @bind-Value="currentPackage.PackageBookingBaseEnumId" T="int" Label="PackageBookingBaseEnumId" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Variant="Variant.Outlined">
+                        <MudSelectItem Value="@(1)" />
+                        <MudSelectItem Value="@(2)" />
+                        <MudSelectItem Value="@(3)" />
+                    </MudSelect>                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudSelect @bind-Value="currentPackage.PackageBookingBaseEnumId" T="int" Label="PackageBookingBaseEnumId" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Variant="Variant.Outlined">
+                        <MudSelectItem Value="@(1)" />
+                        <MudSelectItem Value="@(2)" />
+                        <MudSelectItem Value="@(3)" />
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudCheckBox @bind-Checked="@currentPackage.Optional" Label="Optional" Color="Color.Info"></MudCheckBox>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudCheckBox @bind-Checked="@currentPackage.ShopExtern" Label="ShopExtern" Color="Color.Info"></MudCheckBox>
+                </MudItem>
+            </MudGrid>
+            
+            
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="Cancel" Variant="Variant.Text" StartIcon="@Icons.Filled.Cancel" Color="Color.Default"  Size="Size.Small">cancel</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" ButtonType="ButtonType.Submit" Size="Size.Small">update</MudButton>
+        </DialogActions>
+    </MudDialog>
+</EditForm>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    private EditContext editContext;
+
+    private string searchString1 = "";
+    private PeriodDto selectedItem1 = null;
+    private HashSet<PeriodDto> selectedItems = new HashSet<PeriodDto>();
+
+    private bool FilterFunc1(PeriodDto element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(PeriodDto element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Source.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    [Parameter]
+    public PackageDto currentPackage { get; set; }
+
+    protected override void OnInitialized()
+    {
+
+        editContext = new EditContext(currentPackage);
+
+    }
+
+    private void Editpackage()
+    {
+        MudDialog.Close(DialogResult.Ok(currentPackage));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task AddPeriod()
+    {
+        var dialog = DialogService.Show<AddPeriodModal>();
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            PeriodDto period = (PeriodDto)result.Data;
+
+            currentPackage.Periods.Add(period);
+        }
+    }
+    
+    private async Task DeletePeriod(PeriodDto period)
+    {
+
+        currentPackage.Periods.Remove(period);
+    }
+
+    async Task EditPeriod(PeriodDto period)
+    {
+        var parameters = new DialogParameters { ["period"]= PeriodDtoToModal(period) };
+        var dialog = DialogService.Show<EditPeriodModal>("",parameters);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            PeriodDto annonceDTORes = (PeriodDto)result.Data;
+            PeriodDto p= currentPackage.Periods.FirstOrDefault(p => p.Id == annonceDTORes.Id);
+            p.End=annonceDTORes.End;
+            p.Start = annonceDTORes.Start;
+            p.Source = annonceDTORes.Source;
+            p.Id = annonceDTORes.Id;
+            p.Price = annonceDTORes.Price;
+            p.SourceId = annonceDTORes.SourceId;
+        }
+    }
+
+    private PeriodDto PeriodDtoToModal(PeriodDto period)
+    {
+        PeriodDto currentPeriod = new PeriodDto();
+        currentPeriod.End=period.End;
+        currentPeriod.Start = period.Start;
+        currentPeriod.Source = period.Source;
+        currentPeriod.Id = period.Id;
+        currentPeriod.Price = period.Price;
+        currentPeriod.SourceId = period.SourceId;
+        return currentPeriod;
+    }
+}
