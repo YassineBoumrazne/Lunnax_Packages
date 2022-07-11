@@ -62,7 +62,10 @@
                                 <MudTh>End</MudTh>
                             </HeaderContent>
                             <RowTemplate Context="period">
-                                <MudTd DataLabel="Actions"><MudIconButton OnClick="()=>EditPeriod(period)" Icon="@Icons.Filled.Edit" aria-label="Edit"></MudIconButton></MudTd>
+                                <MudTd DataLabel="Actions">
+                                    <MudIconButton OnClick="()=>EditPeriod(period)" Icon="@Icons.Filled.Edit" aria-label="Edit"></MudIconButton>
+                                    <MudIconButton OnClick="()=>DeletePeriod(period)" Icon="@Icons.Filled.Delete" aria-label="Delete"></MudIconButton>
+                                    </MudTd>
                                 <MudTd DataLabel="Price">@period.Price</MudTd>
                                 <MudTd DataLabel="Source">@period.Source</MudTd>
                                 <MudTd DataLabel="Start">@period.Start.Value.ToShortDateString()</MudTd>
@@ -148,7 +151,7 @@
     private async Task AddPeriod()
     {
         var LastPeriodEnd = package.Periods.LastOrDefault() == null ? null : package.Periods.LastOrDefault().End;
-        var parameters = new DialogParameters { ["LastPeriodEnd"]= LastPeriodEnd };
+        var parameters = new DialogParameters { ["LastPeriodEnd"]= LastPeriodEnd == null ? null: LastPeriodEnd.Value.AddDays(1)};
         var dialog = DialogService.Show<AddPeriodModal>("",parameters);
         var result = await dialog.Result;
 
@@ -158,6 +161,11 @@
 
             package.Periods.Add(period);
         }
+    }
+
+    private async Task DeletePeriod(PeriodDto period)
+    {
+        package.Periods.Remove(period);
     }
 
     async Task EditPeriod(PeriodDto period)
